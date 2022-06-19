@@ -1,0 +1,8 @@
+#!/usr/bin/env php
+<?php
+
+include_once __DIR__ . '/../vendor/autoload.php';
+
+use Pingframework\Boot\Application\ConsolePingBootApplication;
+
+ConsolePingBootApplication::build(false)->run();

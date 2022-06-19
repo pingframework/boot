@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         defaultTestSuite="default">
+    <coverage>
+        <include>
+            <directory>src</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="default">
+            <directory suffix="Test.php">tests</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="XDEBUG_MODE" value="coverage" force="true" />
+        <ini name="xdebug.mode" value="coverage" force="true"/>
+
+        <ini name="error_reporting" value="E_ALL" force="true"/>
+        <ini name="display_errors" value="On" force="true"/>
+        <ini name="memory_limit" value="-1" force="true"/>
+        <ini name="log_errors" value="On" force="true"/>
+        <ini name="log_errors_max_len" value="0" force="true"/>
+        <ini name="apc.enabled" value="On" force="true"/>
+        <ini name="apc.enable_cli" value="On" force="true"/>
+    </php>
+</phpunit>
