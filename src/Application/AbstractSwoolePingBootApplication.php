@@ -74,6 +74,11 @@ abstract class AbstractSwoolePingBootApplication extends AbstractPingBootApplica
         $port = $this->config[self::CONFIG_SWOOLE_BIND_PORT] ?? self::DEFAULT_PORT;
 
         $this->swooleServer = new Server($host, $port, SWOOLE_PROCESS, SWOOLE_SOCK_TCP);
+
+        $config = $this->config;
+        unset($config[self::CONFIG_SWOOLE_BIND_HOST]);
+        unset($config[self::CONFIG_SWOOLE_BIND_PORT]);
+        $this->swooleServer->set($config);
     }
 
     public function listen(?string $host = null, ?int $port = null): void
