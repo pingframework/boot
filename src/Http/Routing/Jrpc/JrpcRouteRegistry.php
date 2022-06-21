@@ -23,6 +23,7 @@ declare(strict_types=1);
 namespace Pingframework\Boot\Http\Routing\Jrpc;
 
 
+use Pingframework\Boot\Annotations\Service;
 use RuntimeException;
 
 /**
@@ -30,6 +31,7 @@ use RuntimeException;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
+#[Service]
 class JrpcRouteRegistry
 {
     /**
