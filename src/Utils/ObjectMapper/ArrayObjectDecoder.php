@@ -72,7 +72,7 @@ class ArrayObjectDecoder implements ArrayObjectDecoderInterface
 
             return $this->unmarshalWithProperties($ref, $payload);
         } catch (Throwable $e) {
-            throw new ObjectMapperException("Failed to unmarshal object", $e->getCode(), $e);
+            throw new ObjectMapperException("Failed to unmarshal object. Reason: " . $e->getMessage(), $e->getCode(), $e);
         }
     }
 

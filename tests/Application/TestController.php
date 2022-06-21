@@ -31,7 +31,7 @@ use Pingframework\Boot\Annotations\RequestJsonField;
 use Pingframework\Boot\Annotations\RequestSchema;
 use Pingframework\Boot\Annotations\RequestBodyField;
 use Pingframework\Boot\Annotations\RequestQueryParam;
-use Pingframework\Boot\Annotations\ResponseSchema;
+use Pingframework\Boot\Annotations\NewInstance;
 use Pingframework\Boot\Annotations\UploadedFile;
 use Pingframework\Boot\Http\Routing\RouteRegistry;
 use Psr\Http\Message\ResponseInterface;
@@ -77,7 +77,7 @@ class TestController
     public function testAction3(
         #[RequestSchema]
         TestRequestJsonSchema $requestSchema,
-        #[ResponseSchema]
+        #[NewInstance]
         TestResponseJsonSchema $responseSchema,
         #[RequestBodyField]
         int $id1,

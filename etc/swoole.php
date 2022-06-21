@@ -1,22 +1,22 @@
 <?php
 
-use Pingframework\Boot\Application\SwoolePingBootApplication;
+use Pingframework\Boot\Application\SlimSwoolePingBootApplication;
 
 return [
     // swoole config
-    SwoolePingBootApplication::CONFIG_SWOOLE => [
+    SlimSwoolePingBootApplication::CONFIG_SWOOLE => [
         // Listen on
-        SwoolePingBootApplication::CONFIG_SWOOLE_BIND_HOST => '127.0.0.1',
-        SwoolePingBootApplication::CONFIG_SWOOLE_BIND_PORT => 8080,
+        SlimSwoolePingBootApplication::CONFIG_SWOOLE_BIND_HOST => '127.0.0.1',
+        SlimSwoolePingBootApplication::CONFIG_SWOOLE_BIND_PORT => 8080,
 
         // Server
-        'reactor_num' => 8,
-        'worker_num' => 2,
-        'discard_timeout_request' => true,
+        'reactor_num'                                          => 8,
+        'worker_num'                                           => 2,
+        'discard_timeout_request'                              => true,
 
         // Worker
-        'max_request' => 0,
-        'max_request_grace' => 0,
+        'max_request'                                          => 0,
+        'max_request_grace'                                    => 0,
 
         // Logging
         'log_level' => 1,

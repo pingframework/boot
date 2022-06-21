@@ -26,7 +26,7 @@ namespace Pingframework\Boot\Command;
 use LogicException;
 use Pingframework\Boot\Annotations\Command;
 use Pingframework\Boot\Application\PingBootApplicationInterface;
-use Pingframework\Boot\Application\SwoolePingBootApplication;
+use Pingframework\Boot\Application\SlimSwoolePingBootApplication;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,8 +36,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Command('app:serve', 'Runs stateful application server')]
-class AppServeCommand extends AbstractCommand
+abstract class AbstractAppServeCommand extends AbstractCommand
 {
     /**
      * Configures the current command.
@@ -48,21 +47,7 @@ class AppServeCommand extends AbstractCommand
         $this->addOption('port', 'p', InputArgument::OPTIONAL, 'Port to bind to');
     }
 
-    /**
-     * Executes the current command.
-     *
-     * This method is not abstract because you can use this class
-     * as a concrete class. In this case, instead of defining the
-     * execute() method, you set the code to execute by passing
-     * a Closure to the setCode() method.
-     *
-     * @return int 0 if everything went fine, or an exit code
-     *
-     * @throws LogicException When this abstract method is not implemented
-     *
-     * @see setCode()
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function serve(string $appClass, InputInterface $input, OutputInterface $output): int
     {
         $logo = <<<EOL
 <info>
@@ -83,7 +68,7 @@ class AppServeCommand extends AbstractCommand
 </info>
 EOL;
 
-        $app = SwoolePingBootApplication::build();
+        $app = $appClass::build();
         $config = $app->getConfig();
         $port = $this->getPort($input, $config);
         $host = $this->getHost($input, $config);
@@ -130,7 +115,7 @@ EOL;
             return (int)$port;
         }
 
-        return (int)($config[SwoolePingBootApplication::CONFIG_SWOOLE_BIND_PORT] ?? SwoolePingBootApplication::DEFAULT_PORT);
+        return (int)($config[SlimSwoolePingBootApplication::CONFIG_SWOOLE_BIND_PORT] ?? SlimSwoolePingBootApplication::DEFAULT_PORT);
     }
 
     private function getHost(InputInterface $input, array $config): string
@@ -140,6 +125,6 @@ EOL;
             return (string)$host;
         }
 
-        return (string)($config[SwoolePingBootApplication::CONFIG_SWOOLE_BIND_HOST] ?? SwoolePingBootApplication::DEFAULT_HOST);
+        return (string)($config[SlimSwoolePingBootApplication::CONFIG_SWOOLE_BIND_HOST] ?? SlimSwoolePingBootApplication::DEFAULT_HOST);
     }
 }

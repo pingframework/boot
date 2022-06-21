@@ -27,6 +27,7 @@ use Ilex\SwoolePsr7\SwooleServerRequestConverter;
 use Pingframework\Boot\Annotations\ConfigFile;
 use Pingframework\Boot\Annotations\Inject;
 use Pingframework\Boot\Annotations\PingBootApplication;
+use Pingframework\Boot\Http\Server\SwooleHttpRequestHandler;
 use Psr\Log\LoggerInterface;
 use Slim\Factory\Psr17\SlimPsr17Factory;
 use Slim\Psr7\Factory\ServerRequestFactory;
@@ -42,9 +43,7 @@ use Swoole\Http\Server;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[PingBootApplication]
-#[ConfigFile(__DIR__ . '/../../etc/swoole.php')]
-class SwoolePingBootApplication extends AbstractPingBootApplication
+abstract class AbstractSwoolePingBootApplication extends AbstractPingBootApplication
 {
     public const CONFIG_SWOOLE           = 'swoole';
     public const CONFIG_SWOOLE_BIND_HOST = 'bind_host';
@@ -56,11 +55,11 @@ class SwoolePingBootApplication extends AbstractPingBootApplication
     protected array $config = [];
 
     #[Inject]
-    private SlimPingBootApplication $slimPba;
-    #[Inject]
-    private LoggerInterface $logger;
+    protected LoggerInterface $logger;
 
-    private Server $swooleServer;
+    protected Server $swooleServer;
+
+    abstract public function getHandler(): SwooleHttpRequestHandler;
 
     public function configure(?string $host = null, ?int $port = null): void
     {
@@ -79,26 +78,13 @@ class SwoolePingBootApplication extends AbstractPingBootApplication
 
     public function listen(?string $host = null, ?int $port = null): void
     {
-        $this->slimPba->configure();
+        $handler = $this->getHandler();
+
+        $handler->configure();
         $this->configure($host, $port);
 
-        // request bridge Swoole to PSR7/Slim
-        $serverRequestFactory = new SwooleServerRequestConverter(
-            new ServerRequestFactory(),
-            new UriFactory(),
-            new UploadedFileFactory(),
-            new StreamFactory()
-        );
-
-        $this->swooleServer->on('request', function (Request $request, Response $response) use ($serverRequestFactory) {
-            // let slim handle request as regular PSR7 request
-            $psr7Response = $this->slimPba->getSlimApp()->handle(
-                // convert swoole request to PSR7/Slim request
-                $serverRequestFactory->createFromSwoole($request)
-            );
-            // response bridge PSR7/Slim to Swoole
-            $converter = new SwooleResponseConverter($response);
-            $converter->send($psr7Response);
+        $this->swooleServer->on('request', function (Request $request, Response $response) use ($handler) {
+            $handler->handle($request, $response);
         });
 
         $this->swooleServer->start();

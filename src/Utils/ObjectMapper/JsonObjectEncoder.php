@@ -40,8 +40,8 @@ use JsonException;
 class JsonObjectEncoder implements JsonObjectEncoderInterface
 {
     public function __construct(
-        private JsonEncoder                 $jsonEncoder,
-        private ArrayObjectEncoderInterface $objectEncoder,
+        public readonly JsonEncoder                 $jsonEncoder,
+        public readonly ArrayObjectEncoderInterface $objectEncoder,
     ) {}
 
     /**

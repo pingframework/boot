@@ -40,8 +40,8 @@ use Pingframework\Boot\Utils\Arrays\Arrays;
 class ArrayObjectMapper implements ArrayObjectMapperInterface
 {
     public function __construct(
-        private ArrayObjectEncoderInterface $encoder,
-        private ArrayObjectDecoderInterface $decoder,
+        public readonly ArrayObjectEncoderInterface $encoder,
+        public readonly ArrayObjectDecoderInterface $decoder,
     ) {}
 
     /**

@@ -39,8 +39,8 @@ use Pingframework\Boot\Annotations\Service;
 class JsonObjectMapper implements JsonObjectMapperInterface
 {
     public function __construct(
-        private JsonObjectEncoderInterface $jsonEncoder,
-        private JsonObjectDecoderInterface $jsonDecoder
+        public readonly JsonObjectEncoderInterface $jsonEncoder,
+        public readonly JsonObjectDecoderInterface $jsonDecoder
     ) {}
 
     /**

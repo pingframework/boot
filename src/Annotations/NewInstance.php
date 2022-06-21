@@ -38,7 +38,7 @@ use RuntimeException;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class ResponseSchema implements RuntimeArgumentInjector
+class NewInstance implements RuntimeArgumentInjector
 {
     public function inject(
         DependencyContainerInterface $c,

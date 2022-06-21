@@ -24,13 +24,12 @@ namespace Pingframework\Boot\Annotations;
 
 use Attribute;
 use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
-use Pingframework\Boot\Utils\Strings\Strings;
-use Psr\Http\Message\ServerRequestInterface;
+use Pingframework\Boot\Http\Middleware\JrpcRequestMethodContext;
+use Pingframework\Boot\Utils\ObjectMapper\DefaultObjectMapper;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionParameter;
-use Slim\Exception\HttpBadRequestException;
-use Slim\Psr7\Request;
+use RuntimeException;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -38,10 +37,10 @@ use Slim\Psr7\Request;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class RequestBodyField implements RuntimeArgumentInjector
+class JrpcRequestSchemaList implements RuntimeArgumentInjector
 {
     public function __construct(
-        public readonly ?string $name = null,
+        public readonly string $type
     ) {}
 
     public function inject(
@@ -50,26 +49,22 @@ class RequestBodyField implements RuntimeArgumentInjector
         ReflectionMethod             $rm,
         ReflectionParameter          $rp,
         array                        $runtime
-    ): mixed {
-        /** @var Request $request */
-        $request = $runtime[ServerRequestInterface::class];
-        $paramName = Strings::camelCaseToUnderscore($rp->getName());
-        $value = $request->getParsedBody()[$this->name ?? $paramName] ?? null;
-
-        if ($value === null) {
-            if (!$rp->isOptional()) {
-                throw new HttpBadRequestException(
-                    $runtime[ServerRequestInterface::class],
-                    sprintf(
-                        'Required POST param "%s" is not present in request',
-                        $this->name ?? $paramName
-                    )
-                );
-            }
-
-            $value = $rp->getDefaultValue();
+    ): array {
+        if ($rp->getType()->getName() !== 'array') {
+            throw new RuntimeException(
+                sprintf(
+                    'Unsupported argument %s type of request schema list in %s::%s',
+                    $rp->getName(),
+                    $rc->getName(),
+                    $rm->getName()
+                )
+            );
         }
 
-        return $value;
+        $om = new DefaultObjectMapper();
+        return $om->mapListFromArray(
+            $runtime[JrpcRequestMethodContext::class]->requestRootSchema->params,
+            $this->type
+        );
     }
 }

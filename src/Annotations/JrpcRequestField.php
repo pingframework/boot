@@ -24,13 +24,14 @@ namespace Pingframework\Boot\Annotations;
 
 use Attribute;
 use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
+use Pingframework\Boot\Http\Middleware\JrpcRequestMethodContext;
+use Pingframework\Boot\Utils\ObjectMapper\DefaultObjectMapper;
 use Pingframework\Boot\Utils\Strings\Strings;
-use Psr\Http\Message\ServerRequestInterface;
 use ReflectionClass;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
-use Slim\Exception\HttpBadRequestException;
-use Slim\Psr7\Request;
+use RuntimeException;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -38,12 +39,8 @@ use Slim\Psr7\Request;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-class RequestBodyField implements RuntimeArgumentInjector
+class JrpcRequestField implements RuntimeArgumentInjector
 {
-    public function __construct(
-        public readonly ?string $name = null,
-    ) {}
-
     public function inject(
         DependencyContainerInterface $c,
         ReflectionClass              $rc,
@@ -51,17 +48,16 @@ class RequestBodyField implements RuntimeArgumentInjector
         ReflectionParameter          $rp,
         array                        $runtime
     ): mixed {
-        /** @var Request $request */
-        $request = $runtime[ServerRequestInterface::class];
+        $params = $runtime[JrpcRequestMethodContext::class]->requestRootSchema->params;
+
         $paramName = Strings::camelCaseToUnderscore($rp->getName());
-        $value = $request->getParsedBody()[$this->name ?? $paramName] ?? null;
+        $value = $params[$this->name ?? $paramName] ?? null;
 
         if ($value === null) {
             if (!$rp->isOptional()) {
-                throw new HttpBadRequestException(
-                    $runtime[ServerRequestInterface::class],
+                throw new RuntimeException(
                     sprintf(
-                        'Required POST param "%s" is not present in request',
+                        'Required json rpc request param "%s" is not exists',
                         $this->name ?? $paramName
                     )
                 );

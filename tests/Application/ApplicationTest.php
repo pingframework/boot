@@ -4,7 +4,7 @@ namespace Pingframework\Boot\Tests\Application;
 
 use PHPUnit\Framework\TestCase;
 use Pingframework\Boot\Application\SlimPingBootApplication;
-use Pingframework\Boot\Application\SwoolePingBootApplication;
+use Pingframework\Boot\Application\SlimSwoolePingBootApplication;
 use Slim\Psr7\Factory\RequestFactory;
 use Slim\Psr7\UploadedFile;
 
