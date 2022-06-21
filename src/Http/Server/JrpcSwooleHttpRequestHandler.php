@@ -59,7 +59,9 @@ class JrpcSwooleHttpRequestHandler implements SwooleHttpRequestHandler
         try {
             assert($request->getMethod() === $this->method, 'Invalid request method');
             assert($request->server['request_uri'] === $this->uri, 'Invalid request uri');
+            assert(isset($request->header['accept']), 'Invalid accept header');
             assert($request->header['accept'] === 'application/json', 'Invalid accept header');
+            assert(isset($request->header['content-type']), 'Invalid content type');
             assert($request->header['content-type'] === 'application/json', 'Invalid content type');
 
             foreach ($this->middlewareRegistry->getAll() as $middleware) {
