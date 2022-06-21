@@ -27,6 +27,7 @@ use LogicException;
 use Pingframework\Boot\Annotations\Command;
 use Pingframework\Boot\Application\JrpcSwoolePingBootApplication;
 use Pingframework\Boot\Application\SlimSwoolePingBootApplication;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -35,9 +36,18 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Command('app:serve:jrpc', 'Runs stateful application server')]
+#[Command('app:serve:swoole', 'Runs stateful application server')]
 class AppServeJrpcCommand extends AbstractAppServeCommand
 {
+    /**
+     * Configures the current command.
+     */
+    protected function configure()
+    {
+        parent::configure();
+        $this->addArgument('class', InputArgument::OPTIONAL, 'The application class to build (including namespace)', JrpcSwoolePingBootApplication::class);
+    }
+
     /**
      * Executes the current command.
      *
@@ -54,6 +64,6 @@ class AppServeJrpcCommand extends AbstractAppServeCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        return $this->serve(JrpcSwoolePingBootApplication::class, $input, $output);
+        return $this->serve($input->getArgument('class'), $input, $output);
     }
 }
