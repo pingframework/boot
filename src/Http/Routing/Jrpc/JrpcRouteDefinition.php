@@ -33,6 +33,5 @@ class JrpcRouteDefinition
         public readonly string  $className,
         public readonly string  $methodName,
         public readonly string  $method,
-        public readonly array   $ignoreMiddlewares = [],
     ) {}
 }

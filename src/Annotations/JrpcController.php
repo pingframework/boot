@@ -28,9 +28,7 @@ use Pingframework\Boot\Annotations\Composition\AutowireDefinitionFinderTrait;
 use Pingframework\Boot\DependencyContainer\DependencyContainerException;
 use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
 use Pingframework\Boot\Http\Routing\Jrpc\JrpcRouteRegistry;
-use Pingframework\Boot\Http\Routing\RouteRegistry;
 use Pingframework\Boot\Utils\DependencyContainer\DI;
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -44,14 +42,9 @@ class JrpcController implements MethodDefinitionRegistrar
 {
     use AutowireDefinitionFinderTrait;
 
-    public readonly array $ignoreMiddleware;
-
     public function __construct(
         public readonly string $method,
-        string                 ...$ignoreMiddleware,
-    ) {
-        $this->ignoreMiddleware = $ignoreMiddleware;
-    }
+    ) {}
 
     /**
      * Register definition in the dependency container.
@@ -73,7 +66,6 @@ class JrpcController implements MethodDefinitionRegistrar
             DI::value($rc->getName()),
             DI::value($rm->getName()),
             DI::value($this->method),
-            DI::value($this->ignoreMiddleware),
         ]);
     }
 }

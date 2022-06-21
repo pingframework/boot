@@ -52,8 +52,7 @@ class JrpcRouteRegistry
         string $className,
         string $methodName,
         string $method,
-        array  $ignoreMiddlewares = []
     ): void {
-        $this->routes[$method] = new JrpcRouteDefinition($className, $methodName, $method, $ignoreMiddlewares);
+        $this->routes[$method] = new JrpcRouteDefinition($className, $methodName, $method);
     }
 }
