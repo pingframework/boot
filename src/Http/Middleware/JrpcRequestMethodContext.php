@@ -24,6 +24,7 @@ namespace Pingframework\Boot\Http\Middleware;
 
 use Pingframework\Boot\Http\Routing\Jrpc\JrpcRequestRootSchema;
 use Pingframework\Boot\Http\Routing\Jrpc\JrpcResponseRootSchema;
+use Pingframework\Boot\Http\Routing\Jrpc\JrpcRouteDefinition;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 
@@ -39,6 +40,7 @@ class JrpcRequestMethodContext extends JrpcRequestContext
         Response                               $response,
         public readonly JrpcRequestRootSchema  $requestRootSchema,
         public readonly JrpcResponseRootSchema $responseRootSchema,
+        public readonly JrpcRouteDefinition    $routeDefinition,
         array                                  $data = [],
     ) {
         parent::__construct($request, $response, $data);

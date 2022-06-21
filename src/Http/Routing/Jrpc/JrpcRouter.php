@@ -65,20 +65,22 @@ class JrpcRouter implements JrpcMiddlewareInterface
             $responses[] = $responseRootSchema;
             $responseRootSchema->id = $requestRootSchema->id;
 
-            $jrpcCtx = new JrpcRequestMethodContext(
-                $ctx->request,
-                $ctx->response,
-                $requestRootSchema,
-                $responseRootSchema,
-                $ctx->data
-            );
-
             try {
+                $rd = $this->routeRegistry->getRoute($requestRootSchema->method);
+                $jrpcCtx = new JrpcRequestMethodContext(
+                    $ctx->request,
+                    $ctx->response,
+                    $requestRootSchema,
+                    $responseRootSchema,
+                    $rd,
+                    $ctx->data
+                );
+
                 foreach ($this->methodMiddlewareRegistry->middlewares as $middleware) {
                     $middleware->handle($jrpcCtx);
                 }
 
-                $this->requestHandler->handle($this->routeRegistry->getRoute($requestRootSchema->method), $jrpcCtx);
+                $this->requestHandler->handle($rd, $jrpcCtx);
             } catch (Throwable $e) {
                 $this->logger->error(
                     sprintf(
