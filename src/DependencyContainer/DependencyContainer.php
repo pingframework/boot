@@ -71,7 +71,7 @@ class DependencyContainer implements DependencyContainerInterface
             } elseif (is_object($definition)) {
                 $this->resolved[$k] = $definition;
             } elseif (is_array($definition) && isset($this->definitions[$k]) && $this->definitions[$k] instanceof ValueDefinition && is_array($this->definitions[$k]->value)) {
-                $this->set($k, new ValueDefinition(array_merge_recursive($this->definitions[$k]->value, $definition)));
+                $this->set($k, new ValueDefinition(array_merge($this->definitions[$k]->value, $definition)));
             } else {
                 $this->set($k, new ValueDefinition($definition));
             }
