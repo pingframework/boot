@@ -26,6 +26,7 @@ use League\Event\EventDispatchingListenerRegistry;
 use Pingframework\Boot\Annotations\Service;
 use Pingframework\Boot\Utils\Priority;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\EventDispatcher\ListenerProviderInterface;
 use Psr\Log\LoggerInterface;
 
@@ -34,7 +35,7 @@ use Psr\Log\LoggerInterface;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Service(EventDispatchingListenerRegistry::class)]
+#[Service(EventDispatcherInterface::class, EventDispatchingListenerRegistry::class)]
 class EventDispatcher extends \League\Event\EventDispatcher
 {
     public function __construct(
