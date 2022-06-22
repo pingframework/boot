@@ -24,7 +24,6 @@ namespace Pingframework\Boot\Application;
 
 use Exception;
 use Pingframework\Boot\Annotations\Autowire;
-use Pingframework\Boot\Annotations\Inject;
 use Pingframework\Boot\Annotations\PingBootApplication;
 use Pingframework\Boot\Command\CommandsRegistry;
 use Symfony\Component\Console\Application;
@@ -37,16 +36,15 @@ use Symfony\Component\Console\Application;
 #[PingBootApplication]
 class ConsolePingBootApplication extends AbstractPingBootApplication
 {
-    #[Inject]
-    private CommandsRegistry $commandsRegistry;
     private Application $symfonyApplication;
 
     #[Autowire]
-    public function configure(): void
-    {
+    public function configure(
+        CommandsRegistry $commandsRegistry
+    ): void {
         $this->symfonyApplication = new Application();
 
-        foreach ($this->commandsRegistry->commands as $command) {
+        foreach ($commandsRegistry->commands as $command) {
             $this->symfonyApplication->add($command);
         }
     }
