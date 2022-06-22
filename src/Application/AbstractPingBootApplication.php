@@ -26,6 +26,8 @@ use Pingframework\Boot\Annotations\ComponentScan;
 use Pingframework\Boot\Annotations\Inject;
 use Pingframework\Boot\DependencyContainer\DependencyContainerException;
 use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
+use Pingframework\Boot\DependencyContainer\ServiceNotFoundException;
+use Pingframework\Boot\DependencyContainer\ServiceResolveException;
 use Pingframework\Boot\Utils\Arrays\Arrays;
 use ReflectionClass;
 
@@ -70,12 +72,15 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
      * Resolves all nested application classes.
      * Configure each found application.
      *
-     * @param bool $debug
+     * @param bool  $debug
+     * @param array $definitions
      * @return static
      *
      * @throws DependencyContainerException
+     * @throws ServiceNotFoundException
+     * @throws ServiceResolveException
      */
-    public static function build(bool $debug = false): static
+    public static function build(bool $debug = false, array $definitions = []): static
     {
         // analyze current application class for attributes
         $rc = new ReflectionClass(static::class);
@@ -94,6 +99,9 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
 
         // apply all config files before resolve applications
         self::applyConfigFiles($c);
+
+        // apply passed definitions
+        $c->setDefinitions($definitions);
 
         // resolve all nested applications
         $c->get(ApplicationRegistry::class);
