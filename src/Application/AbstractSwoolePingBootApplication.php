@@ -22,18 +22,9 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Application;
 
-use Ilex\SwoolePsr7\SwooleResponseConverter;
-use Ilex\SwoolePsr7\SwooleServerRequestConverter;
-use Pingframework\Boot\Annotations\ConfigFile;
 use Pingframework\Boot\Annotations\Inject;
-use Pingframework\Boot\Annotations\PingBootApplication;
 use Pingframework\Boot\Http\Server\SwooleHttpRequestHandler;
 use Psr\Log\LoggerInterface;
-use Slim\Factory\Psr17\SlimPsr17Factory;
-use Slim\Psr7\Factory\ServerRequestFactory;
-use Slim\Psr7\Factory\StreamFactory;
-use Slim\Psr7\Factory\UploadedFileFactory;
-use Slim\Psr7\Factory\UriFactory;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server;

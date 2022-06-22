@@ -33,7 +33,7 @@ use Pingframework\Boot\Http\Server\SwooleHttpRequestHandler;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[PingBootApplication]
-#[ConfigFile(__DIR__ . '/../../etc/swoole.php', __DIR__ . '/../../etc/jrpc.php')]
+#[ConfigFile([__DIR__ . '/../../etc/swoole.php', __DIR__ . '/../../etc/jrpc.php'])]
 class JrpcSwoolePingBootApplication extends AbstractSwoolePingBootApplication
 {
     public function __construct(

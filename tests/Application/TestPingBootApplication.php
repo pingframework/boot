@@ -34,7 +34,7 @@ use Pingframework\Boot\Application\AbstractPingBootApplication;
  */
 #[PingBootApplication]
 #[ComponentScan(outputFile: __DIR__ . '/../../var/cache/dependency-container-definitions.php')]
-#[ConfigFile(__DIR__ . DIRECTORY_SEPARATOR . 'config.php')]
+#[ConfigFile([__DIR__ . '/config.php'])]
 class TestPingBootApplication extends AbstractPingBootApplication
 {
 

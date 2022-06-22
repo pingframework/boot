@@ -41,13 +41,9 @@ class ConfigFile implements ServiceDefinitionRegistrar
 {
     use MethodDefinitionRegistrarTrait;
 
-    public readonly array $paths;
-
     public function __construct(
-        string ...$path,
-    ) {
-        $this->paths = $path;
-    }
+        public readonly array $paths,
+    ) {}
 
     /**
      * @throws DependencyContainerException
