@@ -38,10 +38,7 @@ class ConsolePingBootApplication extends AbstractPingBootApplication
 {
     private Application $symfonyApplication;
 
-    #[Autowire]
-    public function configure(
-        CommandsRegistry $commandsRegistry
-    ): void {
+    public function configure(CommandsRegistry $commandsRegistry): void {
         $this->symfonyApplication = new Application();
 
         foreach ($commandsRegistry->commands as $command) {
@@ -58,6 +55,7 @@ class ConsolePingBootApplication extends AbstractPingBootApplication
      */
     public function run(): int
     {
+        $this->configure($this->getContainer()->get(CommandsRegistry::class));
         return $this->symfonyApplication->run();
     }
 
