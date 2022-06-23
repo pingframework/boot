@@ -48,22 +48,22 @@ class MapProperty
         private ?string $key = null,
         private bool    $omitempty = false,
         private string  $entityType = self::TYPE_MIXED,
-        private string  $decoder = DefaultValueDecoder::class,
-        private string  $encoder = DefaultValueEncoder::class,
+        private ?string  $decoder = DefaultValueDecoder::class,
+        private ?string  $encoder = DefaultValueEncoder::class,
     ) {}
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDecoder(): string
+    public function getDecoder(): ?string
     {
         return $this->decoder;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getEncoder(): string
+    public function getEncoder(): ?string
     {
         return $this->encoder;
     }

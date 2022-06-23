@@ -103,7 +103,7 @@ class ArrayObjectDecoder implements ArrayObjectDecoderInterface
         foreach ($ref->getProperties() as $rp) {
             $mp = $this->getMapProperty($rp);
 
-            if (is_null($mp)) {
+            if (is_null($mp) || $mp->getDecoder() === null) {
                 continue;
             }
 
@@ -124,13 +124,13 @@ class ArrayObjectDecoder implements ArrayObjectDecoderInterface
         $args = [];
 
         foreach ($ref->getConstructor()->getParameters() as $parameter) {
-            $mapProperty = $this->getMapProperty($parameter);
+            $mp = $this->getMapProperty($parameter);
 
-            if (is_null($mapProperty)) {
+            if (is_null($mp) || $mp->getDecoder() === null) {
                 continue;
             }
 
-            $args[$parameter->getName()] = $this->getValueDecoder($mapProperty)->unmarshal($payload, $mapProperty, $parameter);
+            $args[$parameter->getName()] = $this->getValueDecoder($mp)->unmarshal($payload, $mp, $parameter);
         }
 
         try {

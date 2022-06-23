@@ -61,7 +61,7 @@ class ArrayObjectEncoder implements ArrayObjectEncoderInterface
 
             foreach ($ro->getProperties() as $rp) {
                 $mp = $this->getAttr($rp);
-                if (is_null($mp)) {
+                if (is_null($mp) || $mp->getEncoder() === null) {
                     continue;
                 }
 
