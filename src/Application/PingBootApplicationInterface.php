@@ -2,11 +2,10 @@
 
 namespace Pingframework\Boot\Application;
 
-use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
+use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
 
-interface PingBootApplicationInterface extends FileConfigurable
+interface PingBootApplicationInterface
 {
-    public static function build(bool $debug = false, array $definitions = []): static;
-    public function getContainer(): DependencyContainerInterface;
-    public function isDebug(): bool;
+    public static function build(): static;
+    public function getApplicationContext(): DependencyContainerInterface;
 }

@@ -20,28 +20,37 @@
 
 declare(strict_types=1);
 
-namespace Pingframework\Boot\Annotations;
+namespace Pingframework\Boot\Application;
 
-use Attribute;
 use Pingframework\Boot\Console\Command\CommandsRegistry;
-use Pingframework\Ping\Annotations\Variadic;
+use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
+use Symfony\Component\Console\Application;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Attribute(Attribute::TARGET_CLASS)]
-class Command extends Variadic
+abstract class AbstractConsoleApplication extends AbstractPingBootApplication
 {
     public function __construct(
-        public readonly string  $name,
-        public readonly ?string $description = null,
-        public readonly array   $aliases = [],
-        public readonly bool    $hidden = false,
+        DependencyContainerInterface     $applicationContext,
+        public readonly CommandsRegistry $commandsRegistry,
+        public readonly Application      $symfonyApplication,
     ) {
-        parent::__construct(
-            targetServices: [CommandsRegistry::class],
-        );
+        parent::__construct($applicationContext);
+    }
+
+    public function run(): int
+    {
+        if ($this->symfonyApplication->getName() === 'UNKNOWN') {
+            $this->symfonyApplication->setName('Ping Boot CLI');
+        }
+
+        foreach ($this->commandsRegistry->commands as $command) {
+            $this->symfonyApplication->add($command);
+        }
+
+        return $this->symfonyApplication->run();
     }
 }

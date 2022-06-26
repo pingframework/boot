@@ -22,7 +22,8 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Application;
 
-use Pingframework\Boot\Annotations\Service;
+
+use Pingframework\Ping\Annotations\Service;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -32,19 +33,11 @@ use Pingframework\Boot\Annotations\Service;
 #[Service]
 class ApplicationRegistry
 {
-    private array $applications;
+    public readonly array $applications;
 
     public function __construct(
         PingBootApplicationInterface ...$applications
     ) {
         $this->applications = $applications;
-    }
-
-    /**
-     * @return PingBootApplicationInterface[]
-     */
-    public function getApplications(): array
-    {
-        return $this->applications;
     }
 }

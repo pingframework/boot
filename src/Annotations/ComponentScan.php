@@ -33,32 +33,7 @@ use Attribute;
 class ComponentScan
 {
     public function __construct(
-        private array $namespaces = [],
-        private ?string $outputFile = null,
-        private ?string $excludeRegexp = null
+        public readonly array   $namespaces = [],
+        public readonly ?string $excludeRegexp = null
     ) {}
-
-    /**
-     * @return string|null
-     */
-    public function getOutputFile(): ?string
-    {
-        return $this->outputFile;
-    }
-
-    /**
-     * @return array
-     */
-    public function getNamespaces(): array
-    {
-        return $this->namespaces;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getExcludeRegexp(): ?string
-    {
-        return $this->excludeRegexp;
-    }
 }

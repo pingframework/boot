@@ -23,13 +23,16 @@ declare(strict_types=1);
 namespace Pingframework\Boot\Application;
 
 use Pingframework\Boot\Annotations\ComponentScan;
-use Pingframework\Boot\Annotations\Inject;
-use Pingframework\Boot\DependencyContainer\DependencyContainerException;
-use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
-use Pingframework\Boot\DependencyContainer\ServiceNotFoundException;
-use Pingframework\Boot\DependencyContainer\ServiceResolveException;
-use Pingframework\Boot\Utils\Arrays\Arrays;
+use Pingframework\Boot\Annotations\ConfigFile;
+use Pingframework\Ping\Annotations\Autowired;
+use Pingframework\Ping\DependencyContainer\Builder\ContainerBuilder;
+use Pingframework\Ping\DependencyContainer\DependencyContainerException;
+use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
+use Pingframework\Ping\DependencyContainer\ServiceNotFoundException;
+use Pingframework\Ping\DependencyContainer\ServiceResolveException;
+use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionObject;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -38,31 +41,26 @@ use ReflectionClass;
  */
 abstract class AbstractPingBootApplication implements PingBootApplicationInterface
 {
-    #[Inject]
-    protected DependencyContainerInterface $container;
-    #[Inject('debug')]
-    protected bool                         $isDebug = false;
-
-    /**
-     * @return bool
-     */
-    public function isDebug(): bool
-    {
-        return $this->isDebug;
-    }
+    public function __construct(
+        private readonly DependencyContainerInterface $applicationContext
+    ) {}
 
     /**
      * @return DependencyContainerInterface
      */
-    public function getContainer(): DependencyContainerInterface
+    public function getApplicationContext(): DependencyContainerInterface
     {
-        return $this->container;
+        return $this->applicationContext;
     }
 
-    public function configureFromFile(string ...$files): void
+    #[Autowired]
+    public function configureFromFile(): void
     {
-        foreach ($files as $file) {
-            $this->container->setDefinitions(require $file);
+        foreach ($this->findConfigFiles() as $file) {
+            $definitions = require $file;
+            foreach ($definitions as $k => $v) {
+                $this->applicationContext->set($k, $v);
+            }
         }
     }
 
@@ -72,15 +70,13 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
      * Resolves all nested application classes.
      * Configure each found application.
      *
-     * @param bool  $debug
-     * @param array $definitions
      * @return static
      *
      * @throws DependencyContainerException
      * @throws ServiceNotFoundException
      * @throws ServiceResolveException
      */
-    public static function build(bool $debug = false, array $definitions = []): static
+    public static function build(): static
     {
         // analyze current application class for attributes
         $rc = new ReflectionClass(static::class);
@@ -90,51 +86,33 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
 
         // build dependency container based on component scan annotations
         $c = ContainerBuilder::build(
-            $cs->getNamespaces(),
-            static::class,
-            $cs->getExcludeRegexp(),
-            $cs->getOutputFile(),
-            $debug,
+            $cs->namespaces,
+            $cs->excludeRegexp,
         );
 
-        // apply all config files before resolve applications
-        self::applyConfigFiles($c);
-
-        // apply passed definitions
-        $c->setDefinitions($definitions);
+        // exclude main/current application from variadic definitions map
+        $c->getAttributeScannerResultSet()->getVdm()->remove(
+            ApplicationRegistry::class,
+            static::class
+        );
 
         // resolve all nested applications
         $c->get(ApplicationRegistry::class);
 
-        // resolve main application (must be latest)
+        // resolve main application (must be latest to make ability to override container definitions)
         return $c->get(static::class);
     }
 
-    private static function applyConfigFiles(DependencyContainerInterface $c): void
+    private function findConfigFiles(): array
     {
-        Arrays::stream(self::sortConfigFiles($c, $c->get(ConfigFileRegistry::class)->getPaths()))->each(
-            fn(string $file) => $c->setDefinitions(require $file)
-        );
-    }
-
-    private static function sortConfigFiles(DependencyContainerInterface $c, array $registry): array
-    {
-        $l = [];
-        // find ordering in variadic definition of application registry constructor (it is already sorted by attribute scanner)
-        $applicationOrder = $c
-            ->getDefinition(ApplicationRegistry::class)
-            ->getMethods()['__construct'][0]['applications']->services;
-        $applicationOrder[] = static::class;
-
-        foreach ($applicationOrder as $pba) {
-            foreach ($registry[$pba] ?? [] as $configFile) {
-                if (!in_array($configFile, $l)) {
-                    $l[] = $configFile;
-                }
-            }
+        $ro = new ReflectionObject($this);
+        foreach ($ro->getAttributes(ConfigFile::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+            /** @var ConfigFile $ai */
+            $ai = $attribute->newInstance();
+            return $ai->paths;
         }
 
-        return $l;
+        return [];
     }
 
     private static function findComponentScan(ReflectionClass $rc): ComponentScan

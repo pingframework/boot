@@ -20,27 +20,17 @@
 
 declare(strict_types=1);
 
-namespace Pingframework\Boot\Annotations;
+namespace Pingframework\Boot\Console;
 
-use Attribute;
-use Pingframework\Boot\Application\ApplicationRegistry;
-use Pingframework\Ping\Annotations\Variadic;
-use Pingframework\Ping\Utils\Priority;
+use Pingframework\Ping\Annotations\Service;
+use Symfony\Component\Console\Application;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Attribute(Attribute::TARGET_CLASS)]
-class PingBootApplication extends Variadic
+#[Service(Application::class)]
+class ConsoleApplication extends Application
 {
-    public function __construct(
-        int $priority = Priority::NORMAL
-    ) {
-        parent::__construct(
-            targetServices: [ApplicationRegistry::class],
-            priority      : $priority
-        );
-    }
 }

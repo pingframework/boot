@@ -23,13 +23,6 @@ declare(strict_types=1);
 namespace Pingframework\Boot\Annotations;
 
 use Attribute;
-use Pingframework\Boot\Annotations\AttributeScanner\AttributeScannerResultSet;
-use Pingframework\Boot\Annotations\Composition\MethodDefinitionRegistrarTrait;
-use Pingframework\Boot\Application\ConfigFileRegistry;
-use Pingframework\Boot\DependencyContainer\DependencyContainerException;
-use Pingframework\Boot\DependencyContainer\DependencyContainerInterface;
-use Pingframework\Boot\Utils\DependencyContainer\DI;
-use ReflectionClass;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -37,28 +30,9 @@ use ReflectionClass;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class ConfigFile implements ServiceDefinitionRegistrar
+class ConfigFile
 {
-    use MethodDefinitionRegistrarTrait;
-
     public function __construct(
         public readonly array $paths,
     ) {}
-
-    /**
-     * @throws DependencyContainerException
-     */
-    public function registerService(
-        AttributeScannerResultSet    $rs,
-        DependencyContainerInterface $c,
-        ReflectionClass              $rc,
-    ): void {
-        $this->findAutowire($c, new ReflectionClass(ConfigFileRegistry::class))->method(
-            'add',
-            [
-                DI::value($rc->getName()),
-                DI::value($this->paths),
-            ],
-        );
-    }
 }

@@ -23,7 +23,7 @@ declare(strict_types=1);
 namespace Pingframework\Boot\Annotations;
 
 use Attribute;
-use Pingframework\Boot\Application\ApplicationRegistry;
+use Pingframework\Boot\Http\Server\HttpRequestHandlerRegistry;
 use Pingframework\Ping\Annotations\Variadic;
 use Pingframework\Ping\Utils\Priority;
 
@@ -33,13 +33,13 @@ use Pingframework\Ping\Utils\Priority;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Attribute(Attribute::TARGET_CLASS)]
-class PingBootApplication extends Variadic
+class HttpRequestHandler extends Variadic
 {
     public function __construct(
-        int $priority = Priority::NORMAL
+        int $priority = Priority::NORMAL,
     ) {
         parent::__construct(
-            targetServices: [ApplicationRegistry::class],
+            targetServices: [HttpRequestHandlerRegistry::class],
             priority      : $priority
         );
     }

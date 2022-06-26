@@ -20,27 +20,33 @@
 
 declare(strict_types=1);
 
-namespace Pingframework\Boot\Annotations;
+namespace Pingframework\Boot\Console\Command;
 
-use Attribute;
-use Pingframework\Boot\Application\ApplicationRegistry;
-use Pingframework\Ping\Annotations\Variadic;
-use Pingframework\Ping\Utils\Priority;
+use Symfony\Component\Console\Command\Command;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-#[Attribute(Attribute::TARGET_CLASS)]
-class PingBootApplication extends Variadic
+abstract class AbstractCommand extends Command implements AutowireConfigurable
 {
-    public function __construct(
-        int $priority = Priority::NORMAL
-    ) {
-        parent::__construct(
-            targetServices: [ApplicationRegistry::class],
-            priority      : $priority
-        );
+    public function autowiredConfigure(
+        string  $name,
+        ?string $description = null,
+        array   $aliases = [],
+        bool    $hidden = false,
+    ): void {
+        $this->setName($name);
+
+        if ($description !== null) {
+            $this->setDescription($description);
+        }
+
+        if (!empty($aliases)) {
+            $this->setAliases($aliases);
+        }
+
+        $this->setHidden($hidden);
     }
 }
