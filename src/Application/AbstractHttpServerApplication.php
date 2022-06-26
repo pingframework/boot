@@ -73,16 +73,16 @@ abstract class AbstractHttpServerApplication extends AbstractPingBootApplication
             self::CONFIG_SERVER_BIND_PORT => self::DEFAULT_PORT,
         ];
 
+        if ($this->getApplicationContext()->has(self::CONFIG_SERVER)) {
+            return array_merge($config, $this->getApplicationContext()->get(self::CONFIG_SERVER));
+        }
+
         if (!is_null($host)) {
             $config[self::CONFIG_SERVER_BIND_HOST] = $host;
         }
 
         if (!is_null($port)) {
             $config[self::CONFIG_SERVER_BIND_PORT] = $port;
-        }
-
-        if ($this->getApplicationContext()->has(self::CONFIG_SERVER)) {
-            return array_merge($config, $this->getApplicationContext()->get(self::CONFIG_SERVER));
         }
 
         return $config;
