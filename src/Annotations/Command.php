@@ -37,7 +37,7 @@ class Command extends Variadic
     public function __construct(
         public readonly string  $name,
         public readonly ?string $description = null,
-        public readonly array   $aliases = [],
+        public readonly array   $cmdAliases = [],
         public readonly bool    $hidden = false,
     ) {
         parent::__construct(

@@ -54,7 +54,7 @@ class CommandsRegistry
         $command->autowiredConfigure(
             $ca->name,
             $ca->description,
-            $ca->aliases,
+            $ca->cmdAliases,
             $ca->hidden,
         );
     }
