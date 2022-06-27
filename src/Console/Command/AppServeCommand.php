@@ -101,8 +101,8 @@ EOL;
         $output->writeln("--------------------------------------------------------");
         $output->writeln("<comment>Temp directory to save uploaded files to. Default is /tmp.</comment>");
         $output->writeln("========================================================");
-        $output->write(["<options=bold>Listening on host: </>", $host, "\n"]);
-        $output->write(["<options=bold>Listening on port: </>", $port, "\n"]);
+        $output->write(["<options=bold>Listening on host: </>", $config[HttpServerApplication::CONFIG_SERVER_BIND_HOST], "\n"]);
+        $output->write(["<options=bold>Listening on port: </>", $config[HttpServerApplication::CONFIG_SERVER_BIND_PORT], "\n"]);
         $output->writeln("========================================================");
 
         $this->serverApplication->listen($host, $port);
