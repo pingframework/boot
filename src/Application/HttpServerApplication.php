@@ -22,6 +22,8 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Application;
 
+use Pingframework\Boot\Annotations\ConfigFile;
+use Pingframework\Boot\Annotations\PingBootApplication;
 use Pingframework\Boot\Http\Server\HttpRequestHandlerRegistry;
 use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
 use Swoole\Http\Request;
@@ -33,7 +35,9 @@ use Swoole\Http\Server;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
-abstract class AbstractHttpServerApplication extends AbstractPingBootApplication
+#[PingBootApplication]
+#[ConfigFile([__DIR__ . '/../../etc/server.php'])]
+class HttpServerApplication extends AbstractPingBootApplication
 {
     public const CONFIG_SERVER           = 'http_server';
     public const CONFIG_SERVER_BIND_HOST = 'bind_host';
@@ -56,7 +60,7 @@ abstract class AbstractHttpServerApplication extends AbstractPingBootApplication
 
         $this->server = new Server(
             $config[self::CONFIG_SERVER_BIND_HOST],
-            $config[self::CONFIG_SERVER_BIND_PORT],
+            (int)$config[self::CONFIG_SERVER_BIND_PORT],
             SWOOLE_PROCESS,
             SWOOLE_SOCK_TCP
         );
@@ -66,7 +70,7 @@ abstract class AbstractHttpServerApplication extends AbstractPingBootApplication
         $this->server->set($config);
     }
 
-    protected function getConfig(?string $host = null, ?int $port = null): array
+    public function getConfig(?string $host = null, ?int $port = null): array
     {
         $config = [
             self::CONFIG_SERVER_BIND_HOST => self::DEFAULT_HOST,
