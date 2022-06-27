@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Tests\Application;
 
+use Pingframework\Boot\Annotations\ConfigFile;
 use Pingframework\Boot\Annotations\PingBootApplication;
 use Pingframework\Boot\Application\AbstractPingBootApplication;
 use Pingframework\Ping\Annotations\Autowired;
@@ -33,6 +34,7 @@ use Pingframework\Ping\Utils\Priority;
  * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 #[PingBootApplication(Priority::LOWEST)]
+#[ConfigFile([__DIR__ . '/config2.php'])]
 class TestPingBootApplication2 extends AbstractPingBootApplication
 {
     #[Autowired]

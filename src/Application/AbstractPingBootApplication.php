@@ -58,6 +58,13 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
         foreach (self::findConfigFiles() as $file) {
             $definitions = require $file;
             foreach ($definitions as $k => $v) {
+                if (is_array($v) && $c->has($k)) {
+                    $cv = $c->get($k);
+                    if (is_array($cv)) {
+                        $v = array_merge($cv, $v);
+                    }
+                }
+
                 $c->set($k, $v);
             }
         }

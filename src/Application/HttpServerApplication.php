@@ -78,7 +78,7 @@ class HttpServerApplication extends AbstractPingBootApplication
         ];
 
         if ($this->getApplicationContext()->has(self::CONFIG_SERVER)) {
-            return array_merge($config, $this->getApplicationContext()->get(self::CONFIG_SERVER));
+            $config = array_merge($config, $this->getApplicationContext()->get(self::CONFIG_SERVER));
         }
 
         if (!is_null($host)) {

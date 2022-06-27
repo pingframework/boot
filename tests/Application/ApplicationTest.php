@@ -15,5 +15,7 @@ class ApplicationTest extends TestCase
         $this->assertEquals('bar', $c->get('foo'));
         $this->assertEquals(42, $c->get('answer'));
         $this->assertEquals(42, $c->get('answer2'));
+
+        $this->assertEquals(['x' => 1, 'y' => 2, 'z' => 3], $c->get('arr'));
     }
 }
