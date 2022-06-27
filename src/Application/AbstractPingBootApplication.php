@@ -22,9 +22,10 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Application;
 
+use InvalidArgumentException;
 use Pingframework\Boot\Annotations\ComponentScan;
 use Pingframework\Boot\Annotations\ConfigFile;
-use Pingframework\Ping\Annotations\Autowired;
+use Pingframework\Ping\DependencyContainer\AutowiredServiceRegistry;
 use Pingframework\Ping\DependencyContainer\Builder\ContainerBuilder;
 use Pingframework\Ping\DependencyContainer\DependencyContainerException;
 use Pingframework\Ping\DependencyContainer\DependencyContainerInterface;
@@ -32,7 +33,6 @@ use Pingframework\Ping\DependencyContainer\ServiceNotFoundException;
 use Pingframework\Ping\DependencyContainer\ServiceResolveException;
 use ReflectionAttribute;
 use ReflectionClass;
-use ReflectionObject;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -53,13 +53,12 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
         return $this->applicationContext;
     }
 
-    #[Autowired]
-    public function configureFromFile(): void
+    private static function configureFromFiles(DependencyContainerInterface $c): void
     {
-        foreach ($this->findConfigFiles() as $file) {
+        foreach (self::findConfigFiles() as $file) {
             $definitions = require $file;
             foreach ($definitions as $k => $v) {
-                $this->applicationContext->set($k, $v);
+                $c->set($k, $v);
             }
         }
     }
@@ -88,6 +87,7 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
         $c = ContainerBuilder::build(
             $cs->namespaces,
             $cs->excludeRegexp,
+            false,
         );
 
         // exclude main/current application from variadic definitions map
@@ -96,17 +96,34 @@ abstract class AbstractPingBootApplication implements PingBootApplicationInterfa
             static::class
         );
 
+        // configure from files nested apps
+        foreach ($c->getAttributeScannerResultSet()->getVdm()->get(ApplicationRegistry::class) as $appClass) {
+            if (!is_subclass_of($appClass, AbstractPingBootApplication::class)) {
+                throw new InvalidArgumentException(
+                    "Application class {$appClass} must extend AbstractPingBootApplication"
+                );
+            }
+            $appClass::configureFromFiles($c);
+        }
+        // configure from files main apps (must be latest)
+        static::configureFromFiles($c);
+
         // resolve all nested applications
         $c->get(ApplicationRegistry::class);
 
         // resolve main application (must be latest to make ability to override container definitions)
-        return $c->get(static::class);
+        $app = $c->get(static::class);
+
+        // resolve all autowired services
+        $c->get(AutowiredServiceRegistry::class);
+
+        return $app;
     }
 
-    private function findConfigFiles(): array
+    private static function findConfigFiles(): array
     {
-        $ro = new ReflectionObject($this);
-        foreach ($ro->getAttributes(ConfigFile::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        $rc = new ReflectionClass(static::class);
+        foreach ($rc->getAttributes(ConfigFile::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             /** @var ConfigFile $ai */
             $ai = $attribute->newInstance();
             return $ai->paths;
