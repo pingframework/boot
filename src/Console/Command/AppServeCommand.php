@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 namespace Pingframework\Boot\Console\Command;
 
+use Pingframework\Boot\Annotations\Command;
 use Pingframework\Boot\Application\HttpServerApplication;
 use Pingframework\Ping\Annotations\Inject;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +34,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @copyright 2022
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
+#[Command('app:serve', 'Run http server')]
 class AppServeCommand extends AbstractCommand
 {
     #[Inject]
