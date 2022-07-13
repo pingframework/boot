@@ -24,7 +24,9 @@ namespace Pingframework\Boot\Logging;
 
 use Pingframework\Ping\Annotations\Service;
 use Pingframework\Ping\Utils\Json\JsonEncoderInterface;
+use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 /**
  * @author    Oleg Bronzov <oleg.bronzov@gmail.com>
@@ -32,126 +34,34 @@ use Psr\Log\LoggerInterface;
  * @license   https://opensource.org/licenses/MIT  The MIT License
  */
 #[Service(LoggerInterface::class)]
-class DefaultLogger implements LoggerInterface
+class DefaultLogger extends AbstractLogger
 {
+    public const LOG_LEVEL_EMERGENCY = 1;
+    public const LOG_LEVEL_ALERT     = 2;
+    public const LOG_LEVEL_CRITICAL  = 4;
+    public const LOG_LEVEL_ERROR     = 8;
+    public const LOG_LEVEL_WARNING   = 16;
+    public const LOG_LEVEL_NOTICE    = 32;
+    public const LOG_LEVEL_INFO      = 64;
+    public const LOG_LEVEL_DEBUG     = 128;
+    public const LOG_LEVEL_ALL       = self::LOG_LEVEL_EMERGENCY | self::LOG_LEVEL_ALERT | self::LOG_LEVEL_CRITICAL | self::LOG_LEVEL_ERROR | self::LOG_LEVEL_WARNING | self::LOG_LEVEL_NOTICE | self::LOG_LEVEL_INFO | self::LOG_LEVEL_DEBUG;
+
+    public const LOG_LEVEL_MAP = [
+        LogLevel::EMERGENCY => self::LOG_LEVEL_EMERGENCY,
+        LogLevel::ALERT     => self::LOG_LEVEL_ALERT,
+        LogLevel::CRITICAL  => self::LOG_LEVEL_CRITICAL,
+        LogLevel::ERROR     => self::LOG_LEVEL_ERROR,
+        LogLevel::WARNING   => self::LOG_LEVEL_WARNING,
+        LogLevel::NOTICE    => self::LOG_LEVEL_NOTICE,
+        LogLevel::INFO      => self::LOG_LEVEL_INFO,
+        LogLevel::DEBUG     => self::LOG_LEVEL_DEBUG,
+    ];
+
+    public int $logLevel = self::LOG_LEVEL_ALL;
+
     public function __construct(
         public readonly JsonEncoderInterface $jsonEncoder,
     ) {}
-
-    /**
-     * System is unusable.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function emergency(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("EMERGENCY", $message, $context);
-    }
-
-    /**
-     * Action must be taken immediately.
-     *
-     * Example: Entire website down, database unavailable, etc. This should
-     * trigger the SMS alerts and wake you up.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function alert(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("ALERT", $message, $context);
-    }
-
-    /**
-     * Critical conditions.
-     *
-     * Example: Application component unavailable, unexpected exception.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function critical(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("CRITICAL", $message, $context);
-    }
-
-    /**
-     * Runtime errors that do not require immediate action but should typically
-     * be logged and monitored.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function error(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("ERROR", $message, $context);
-    }
-
-    /**
-     * Exceptional occurrences that are not errors.
-     *
-     * Example: Use of deprecated APIs, poor use of an API, undesirable things
-     * that are not necessarily wrong.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function warning(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("WARNING", $message, $context);
-    }
-
-    /**
-     * Normal but significant events.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function notice(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("NOTICE", $message, $context);
-    }
-
-    /**
-     * Interesting events.
-     *
-     * Example: User logs in, SQL logs.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function info(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("INFO", $message, $context);
-    }
-
-    /**
-     * Detailed debug information.
-     *
-     * @param string|\Stringable $message
-     * @param mixed[]            $context
-     *
-     * @return void
-     */
-    public function debug(\Stringable|string $message, array $context = []): void
-    {
-        $this->log("DEBUG", $message, $context);
-    }
 
     /**
      * Logs with an arbitrary level.
@@ -166,11 +76,17 @@ class DefaultLogger implements LoggerInterface
      */
     public function log($level, \Stringable|string $message, array $context = []): void
     {
-        error_log(sprintf(
-            "%s: %s. Context: %s",
-            strtoupper($level),
-            $message,
-            $this->jsonEncoder->marshal($context)
-        ));
+        if (!(self::LOG_LEVEL_MAP[$level] & $this->logLevel)) {
+            return;
+        }
+
+        error_log(
+            sprintf(
+                "%s: %s. Context: %s",
+                strtoupper($level),
+                $message,
+                $this->jsonEncoder->marshal($context)
+            )
+        );
     }
 }
