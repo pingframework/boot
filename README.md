@@ -54,7 +54,7 @@ class MyService
 
 Ping boos is using the swoole as an embedded application server.
 To handle the http requests, we need to create a handler class.
->> NOTE: You can have multiple handlers in your application.
+> NOTE: You can have multiple handlers in your application.
 
 ```php
 #[HttpRequestHandler]
